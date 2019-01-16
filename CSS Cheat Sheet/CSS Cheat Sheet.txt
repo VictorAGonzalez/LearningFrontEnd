@@ -1,0 +1,19 @@
+Inline CSS: Directly in the HTML			(NOOOO!)
+Internal CSS: Using <style> tags within a single document
+External CSS: Linking an external .css file
+
+CSS Selectors:
+	selector { property:value; }
+
+	Box Model:
+	margin	border	padding	content	padding	border	margin
+
+	Margin padding:
+	margin: 5px	10px	5px		10px
+			top right 	bottom 	left
+
+		or
+
+	margin: 5px		10px
+			top		left
+			bottom	right 

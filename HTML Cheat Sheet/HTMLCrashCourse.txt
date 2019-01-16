@@ -1,0 +1,62 @@
+Notes for HTML Crash Course:
+	<tagname>content</tagname>:	Element names surrounded by angle brackets
+								Normally come in pairs
+								End tag is usually the same but with a forward slash
+								Some tags close themselves
+	Selfclosing tab:	<br />
+
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Page Title</title> 
+		</head>
+		<body>
+			<h1>My First Heading</h1>
+			<p>My first Paragraph</p>
+		</body>
+	</html>
+
+	CTRL + U shows the code
+	Comment:	<!--	-->
+
+	1em is a measurement in CSS
+
+	<br> is a line break
+	<hr> is a long line
+	<div></div> puts shit on seperate lines
+
+	TAGS:
+		Inline Elements:
+			Do not start on a new line
+			Take only the necessary width
+
+		Block Elements:		(Paragraphs, Headings, etc...)
+			Start on a new line
+			Take full width available
+
+		<tagname attributename="attributevalue"> content </tagname>
+		<h1 title="My Company">About Us</h1>
+
+		Links:
+			<a href="" target="_blank">	</a>	Is for redirecting you to a new link
+												target is for opening a new tab
+	Lists:
+		<ul></ul> is an unordered list(bullets)
+		<ol></ol> is an ordered list(numbers)
+
+	Tables:
+		<tr></tr> is a table row
+		<td></td> is a table data
+
+	Semantic Tags:
+		header
+		footer
+		aside
+		main
+		article
+		nav
+		section
+		details
+
+Notes for CSS Crash Course:
+	
