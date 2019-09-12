@@ -1,0 +1,273 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Serverless private URL shortener based on Amazon S3, AWS Lambda, Amazon CloudFront and API Gateway.",
+    "Parameters": {
+        "AppCode": {
+            "Type": "String",
+            "MaxLength": "5",
+            "AllowedPattern": "^([a-z0-9_-]){5}$",
+            "Description": "The application code name cannot be of more that 5 characters and must be lower case for the Bucket name",
+            "ConstraintDescription": "Appcode field does not match the required constraints"
+        },
+        "ShortDomainName": {
+            "Type": "String",
+            "Description": "Either fpl.co or glf.pw",
+            "ConstraintDescription": "URL is neither fpl.co or glf.pw"
+        }
+    },
+    "Resources": {
+        "S3BucketForURLs": {
+            "Type": "AWS::S3::Bucket",
+            "DeletionPolicy": "Delete",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "2",
+                                        {
+                                            "Fn::ImportValue": "Account-Global-AccountCodeLower"
+                                        },
+                                        {
+                                            "Fn::ImportValue": {
+                                                "Fn::Join": [
+                                                    "-",
+                                                    [
+                                                        "Account-Global-RegionCodeLower",
+                                                        {
+                                                            "Ref": "AWS::Region"
+                                                        }
+                                                    ]
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                ]
+                            },
+                            {
+                                "Ref": "AppCode"
+                            },
+                            "urlshortener",
+                            "s3"
+                        ]
+                    ]
+                },
+                "WebsiteConfiguration": {
+                    "IndexDocument": "index.html",
+                    "ErrorDocument": "error.html"
+                }
+            }
+        },
+        "UrlShortenerBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Id": "MyPolicy",
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "ReadAccessLambdaExecRoleUrlShortener",
+                            "Action": [
+                                "s3:GetObject",
+                                "s3:PutObject",
+                                "s3:PutObjectAcl"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "S3BucketForURLs"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:iam::",
+                                            {
+                                                "Ref": "AWS::AccountId"
+                                            },
+                                            ":role/LambdaExecRoleUrlShortener"
+                                        ]
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Bucket": {
+                    "Ref": "S3BucketForURLs"
+                }
+            }
+        },
+        "CloudFrontDistrib": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Properties": {
+                "DistributionConfig": {
+                    "Aliases":[
+                        { "Ref" : "ShortDomainName" }
+                    ],
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::Join": [
+                                    "-",
+                                    [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "2",
+                                                    {
+                                                        "Fn::ImportValue": "Account-Global-AccountCodeLower"
+                                                    },
+                                                    {
+                                                        "Fn::ImportValue": {
+                                                            "Fn::Join": [
+                                                                "-",
+                                                                [
+                                                                    "Account-Global-RegionCodeLower",
+                                                                    {
+                                                                        "Ref": "AWS::Region"
+                                                                    }
+                                                                ]
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Ref": "AppCode"
+                                        },
+                                        "urlshortener",
+                                        "s3.s3",
+                                        "website",
+                                        {
+                                            "Fn::Join" : [
+                                                ".",
+                                                [
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    {
+                                                        "Ref": "AWS::URLSuffix"
+                                                    }
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Join": [
+                                    "-",
+                                    [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "S3-Website-2",
+                                                    {
+                                                        "Fn::ImportValue": "Account-Global-AccountCodeLower"
+                                                    },
+                                                    {
+                                                        "Fn::ImportValue": {
+                                                            "Fn::Join": [
+                                                                "-",
+                                                                [
+                                                                    "Account-Global-RegionCodeLower",
+                                                                    {
+                                                                        "Ref": "AWS::Region"
+                                                                    }
+                                                                ]
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Ref": "AppCode"
+                                        },
+                                        "urlshortener",
+                                        "s3.s3",
+                                        "website",
+                                        {
+                                            "Fn::Join" : [
+                                                ".",
+                                                [
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    {
+                                                        "Ref": "AWS::URLSuffix"
+                                                    }
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                ]
+                            },
+                            "CustomOriginConfig": {
+                                "HTTPPort" : 80,
+                                "HTTPSPort" : 443,
+                                "OriginKeepaliveTimeout" : 5,
+                                "OriginProtocolPolicy": "http-only"
+                            }
+                        }
+                    ],
+                    "Enabled": true,
+                    "IPV6Enabled": true,
+                    "ViewerCertificate":{
+                        "AcmCertificateArn" : { "Ref" : "Certificate" },
+                        "SslSupportMethod" : "sni-only"
+                    },
+                    "DefaultCacheBehavior":{
+                        "ForwardedValues": {
+                            "QueryString" : false
+                        },
+                        "TargetOriginId": "S3-Website-2pav-vic19-urlshortener-s3.s3-website-us-east-1.amazonaws.com",
+                        "ViewerProtocolPolicy": "allow-all"
+                    },
+                    "CacheBehaviors": [
+                        {
+                            "AllowedMethods": [
+                                "GET",
+                                "HEAD"
+                            ],
+                            "CachedMethods": [
+                                "GET",
+                                "HEAD"
+                            ],
+                            "TargetOriginId": "S3-Website-2pav-vic19-urlshortener-s3.s3-website-us-east-1.amazonaws.com",
+                            "ViewerProtocolPolicy": "allow-all",
+                            "PathPattern": "/*",
+                            "ForwardedValues": {
+                                "QueryString" : false
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "Certificate": {
+            "Type" : "AWS::CertificateManager::Certificate",
+            "Properties" : {
+                "DomainName" : { "Ref" : "ShortDomainName" },
+                "ValidationMethod" : "DNS"
+                }
+        }
+    }
+}
